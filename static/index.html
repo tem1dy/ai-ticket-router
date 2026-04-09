@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система маршрутизации обращений | СИБИНТЕК СОФТ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-700 font-sans min-h-screen flex flex-col">
+    <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <!-- Логотип СИБИНТЕК СОФТ -->
+                <img src="https://www.sstu.ru/upload/medialibrary/e8c/Vert_belyi-fon.jpg" 
+                     alt="СИБИНТЕК СОФТ" class="h-20 object-contain"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                <div class="hidden items-center gap-2">
+                    <div class="w-8 h-8 bg-blue-900 rounded flex items-center justify-center text-white font-bold text-sm">СС</div>
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">СИБИНТЕК СОФТ</span>
+                </div>
+                <p class="text-xl text-slate-500 ml-2 border-l pl-3 border-slate-200">Система интеллектуальной маршрутизации</p>
+            </div>
+            <div class="flex gap-3">
+                <button id="runBtn" class="bg-blue-900 hover:bg-blue-800 text-white px-5 py-2.5 rounded-lg font-medium transition disabled:opacity-50 border border-blue-950">Запустить обработку</button>
+                <button id="exportBtn" class="hidden bg-white hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-lg font-medium transition border border-slate-200">Экспорт отчёта</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8 flex-1 space-y-8">
+        <div id="loader" class="hidden text-center py-16">
+            <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-blue-900 border-t-transparent"></div>
+            <p class="mt-4 text-slate-500 text-sm">Выполняется анализ обращений и распределение нагрузки...</p>
+        </div>
+
+        <!-- Статистика (4 карточки) -->
+        <div id="stats" class="hidden fade-in grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-lg border border-slate-100 shadow-sm">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Всего обращений</p>
+                <p class="text-2xl font-semibold text-slate-900 mt-1" id="stat-total">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-lg border border-slate-100 shadow-sm">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Корректно</p>
+                <p class="text-2xl font-semibold text-emerald-700 mt-1" id="stat-correct">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-lg border border-slate-100 shadow-sm">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Ошибки</p>
+                <p class="text-2xl font-semibold text-red-700 mt-1" id="stat-incorrect">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-lg border border-slate-100 shadow-sm">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Точность</p>
+                <p class="text-2xl font-semibold text-blue-900 mt-1" id="stat-accuracy">0%</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+                <div class="px-5 py-4 border-b border-slate-100">
+                    <h2 class="font-semibold text-slate-900">Обращения <span id="ticket-count" class="text-sm font-normal text-slate-400"></span></h2>
+                </div>
+                <div class="table-scroll">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-100 text-slate-500 uppercase text-xs">
+                            <tr><th class="px-4 py-3 text-left">ID</th><th class="px-4 py-3 text-left">Текст</th><th class="px-4 py-3 text-left">Категория</th><th class="px-4 py-3 text-left">Приоритет</th></tr>
+                        </thead>
+                        <tbody id="body-tickets" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+                <div class="px-5 py-4 border-b border-slate-100">
+                    <h2 class="font-semibold text-slate-900">Сотрудники <span id="emp-count" class="text-sm font-normal text-slate-400"></span></h2>
+                </div>
+                <div class="table-scroll">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-100 text-slate-500 uppercase text-xs">
+                            <tr><th class="px-4 py-3 text-left">Сотрудник</th><th class="px-4 py-3 text-left">Уровень</th><th class="px-4 py-3 text-left">Компетенции</th><th class="px-4 py-3 text-left">Нагрузка</th></tr>
+                        </thead>
+                        <tbody id="body-employees" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="results-section" class="hidden fade-in bg-white rounded-lg border border-slate-200 shadow-sm">
+            <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h2 class="font-semibold text-slate-900">Результаты распределения <span id="result-count" class="text-sm font-normal text-slate-400"></span></h2>
+                <div class="flex gap-4 text-xs">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Корректно</span>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">Ошибка</span>
+                </div>
+            </div>
+            <div class="table-scroll">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 text-slate-500 uppercase text-xs">
+                        <tr>
+                            <th class="px-4 py-3 text-left">ID</th><th class="px-4 py-3 text-left">Обращение</th>
+                            <th class="px-4 py-3 text-left">Категория (исходная)</th><th class="px-4 py-3 text-left">Категория (система)</th>
+                            <th class="px-4 py-3 text-left">Уверенность</th><th class="px-4 py-3 text-left">Приоритет</th>
+                            <th class="px-4 py-3 text-left">Ответственный</th><th class="px-4 py-3 text-left">Уровень</th>
+                            <th class="px-4 py-3 text-left">Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-results" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

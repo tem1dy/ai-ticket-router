@@ -1,0 +1,34 @@
+body {
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.table-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+}
+.table-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+.table-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.table-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+.hidden {
+    display: none !important;
+}
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
